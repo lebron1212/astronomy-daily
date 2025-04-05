@@ -13,7 +13,7 @@ function fetchAstronomyData(position) {
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": "Basic " + btoa("APP_ID:APP_KEY") // Placeholder for GitHub Actions
+    "Authorization": "Basic " + btoa("65d206cd-4621-4456-a44e-07dc8c0f1d18:1065a5af9ef6e3c801b229d47a0be2bf6663fc6f6fc8a8d02a671ac41380570bbaf033ccae5cbdb2e362b412dcc8736300a1250d9ff55fb709441dc0738035500d932c17fce74e92f060cdcdaa0a68bbbcc2910da6d658663c6b8b4275f486b7594be878b3b7f7ef85e8d4e5800dc932") // Placeholder for GitHub Actions
   };
 
   const url = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=${latitude}&longitude=${longitude}&from_date=today&to_date=today&elevation=0`;
