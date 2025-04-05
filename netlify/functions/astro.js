@@ -21,7 +21,7 @@ export async function handler(event) {
     "Authorization": "Basic " + creds,
   };
 
-  const url = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=${latitude}&longitude=${longitude}&from_date=today&to_date=today&elevation=0`;
+  const url = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=${latitude}&longitude=${longitude}&from_date=today&to_date=today&elevation=1`;
 
   const response = await fetch(url, { headers });
 
