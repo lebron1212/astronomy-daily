@@ -20,9 +20,9 @@ export async function handler(event) {
   const creds = Buffer.from(`${process.env.ASTRO_USER}:${process.env.ASTRO_KEY}`).toString("base64");
 
   const headers = {
-    "Content-Type": "application/json",
-    "Authorization": "Basic " + creds,
-  };
+  "Content-Type": "application/json",
+  "Authorization": `Basic ${creds}`,
+};
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
 
