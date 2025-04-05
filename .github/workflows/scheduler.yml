@@ -18,10 +18,11 @@ jobs:
           sed -i "s/APP_ID/${{ secrets.APP_ID }}/g" tracker.js
           sed -i "s/APP_KEY/${{ secrets.APP_KEY }}/g" tracker.js
 
-      - name: Commit changes
+      - name: Commit changes and push using GH_TOKEN
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add tracker.js
           git commit -m "Inject AstronomyAPI credentials" || echo "No changes to commit"
-          git push
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
+          git push origin main
