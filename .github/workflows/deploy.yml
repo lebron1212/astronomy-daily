@@ -1,0 +1,22 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Inject API credentials
+        run: |
+          sed -i "s|__APP_ID__|${{ secrets.ASTRO_API_ID }}|" tracker.js
+          sed -i "s|__APP_KEY__|${{ secrets.ASTRO_API_KEY }}|" tracker.js
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
