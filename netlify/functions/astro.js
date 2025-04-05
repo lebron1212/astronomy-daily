@@ -18,7 +18,7 @@ export async function handler(event) {
 
   const headers = {
     "Content-Type": "application/json",
-    "apiKey": process.env.ASTRONOMY_API_KEY, // 🔥 THIS is the new format
+    "Auth-Token": process.env.ASTRO_AUTH_TOKEN, // ✅ THIS is the fix
   };
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
