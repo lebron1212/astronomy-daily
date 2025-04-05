@@ -4,15 +4,27 @@ function fetchLocationAndData() {
   fetch("https://ipapi.co/json/")
     .then(res => res.json())
     .then(loc => {
-      fetchAstronomyData(loc.latitude, loc.longitude);
+      const lat = parseFloat(loc.latitude);
+      const lon = parseFloat(loc.longitude);
+
+      console.log("Location from IP:", lat, lon);
+
+      if (!lat || !lon) {
+        console.warn("Invalid IP location — falling back to LA");
+        fetchAstronomyData(34.0522, -118.2437); // Los Angeles fallback
+      } else {
+        fetchAstronomyData(lat, lon);
+      }
     })
     .catch(err => {
-      eventList.innerHTML = "<p>Unable to get location from IP.</p>";
-      console.error("IP Location Error:", err);
+      console.warn("IP geolocation error — using fallback:", err);
+      fetchAstronomyData(34.0522, -118.2437); // Fallback: Los Angeles
     });
 }
 
 function fetchAstronomyData(latitude, longitude) {
+  console.log("Sending coords to Netlify:", latitude, longitude);
+
   fetch("/.netlify/functions/astro", {
     method: "POST",
     body: JSON.stringify({ latitude, longitude }),
