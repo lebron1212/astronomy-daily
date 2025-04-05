@@ -1,31 +1,31 @@
 name: Astronomy Tracker Update
 
 on:
-  workflow_dispatch:      # enables manual run button
+  workflow_dispatch:
   push:
     branches: [main]
   schedule:
-    - cron: '0 * * * *'   # every hour
+    - cron: '0 * * * *'
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Replace AstronomyAPI credentials in JS
+    steps:
+      - name: Clone repo using GH_TOKEN
         run: |
+          git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} repo
+          cd repo
+
+          # Replace credentials
           sed -i "s/APP_ID/${{ secrets.APP_ID }}/g" tracker.js
           sed -i "s/APP_KEY/${{ secrets.APP_KEY }}/g" tracker.js
 
-      - name: Commit changes and push using GH_TOKEN
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          # Commit and push
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git add tracker.js
           git commit -m "Inject AstronomyAPI credentials" || echo "No changes to commit"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
           git push origin main
