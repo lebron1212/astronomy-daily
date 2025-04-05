@@ -13,7 +13,7 @@ function fetchAstronomyData(position) {
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": "Basic " + btoa("APP_ID:APP_KEY")
+    "Authorization": "Basic " + btoa("APP_ID:APP_KEY") // <- Replaced by workflow only at runtime
   };
 
   const url = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=${latitude}&longitude=${longitude}&from_date=today&to_date=today&elevation=0`;
