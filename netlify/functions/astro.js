@@ -1,8 +1,21 @@
-// netlify/functions/astro.js
 export async function handler(event) {
-  const { latitude, longitude } = JSON.parse(event.body);
+  const body = JSON.parse(event.body || '{}');
+  const latitude = parseFloat(body.latitude);
+  const longitude = parseFloat(body.longitude);
 
-  const creds = Buffer.from(process.env.ASTRO_USER + ":" + process.env.ASTRO_KEY).toString("base64");
+  console.log("NETLIFY FUNC → lat:", latitude, "lon:", longitude);
+
+  if (!latitude || !longitude) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: "Missing or invalid lat/lon" }),
+    };
+  }
+
+  const creds = Buffer.from(
+    process.env.ASTRO_USER + ":" + process.env.ASTRO_KEY
+  ).toString("base64");
+
   const headers = {
     "Content-Type": "application/json",
     "Authorization": "Basic " + creds,
@@ -13,6 +26,7 @@ export async function handler(event) {
   const response = await fetch(url, { headers });
 
   if (!response.ok) {
+    console.error("AstronomyAPI failed:", await response.text());
     return {
       statusCode: response.status,
       body: JSON.stringify({ error: "Failed to fetch data from AstronomyAPI" }),
