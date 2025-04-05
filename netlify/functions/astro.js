@@ -16,11 +16,9 @@ export async function handler(event) {
   const yyyy_mm_dd = now.toISOString().split("T")[0];
   const hh_mm = now.toISOString().split("T")[1].slice(0, 5);
 
-  // 🚨 Spoof the origin header to match your approved frontend domain
   const headers = {
     "Content-Type": "application/json",
-    "x-app-id": process.env.ASTRO_APP_ID,
-    "Origin": "https://spectacular-meerkat-5da536.netlify.app", // 👈 critical
+    "Authorization": `Bearer ${process.env.ASTRO_KEY}`, // ✅ NEW Bearer token format
   };
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
@@ -34,6 +32,7 @@ export async function handler(event) {
   };
 
   console.log("Sending AstronomyAPI request:", JSON.stringify(requestBody));
+  console.log("Using API Key:", process.env.ASTRO_KEY ? "✅ Set" : "❌ MISSING");
 
   const response = await fetch(url, {
     method: "POST",
@@ -43,7 +42,7 @@ export async function handler(event) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("AstronomyAPI raw response:", errorText);
+    console.error("❌ AstronomyAPI raw response:", errorText);
     return {
       statusCode: response.status,
       body: errorText,
