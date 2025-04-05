@@ -12,20 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_KEY: ${{ secrets.APP_KEY }}
 
     steps:
       - name: Clone repo using GH_TOKEN
         run: |
           git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }} repo
-          cd repo
 
-          # Replace credentials
-          sed -i "s/APP_ID/${{ secrets.APP_ID }}/g" tracker.js
-          sed -i "s/APP_KEY/${{ secrets.APP_KEY }}/g" tracker.js
+      - name: Inject secrets into tracker.js (runtime only)
+        working-directory: repo
+        run: |
+          sed -i "s/APP_ID/${APP_ID}/g" tracker.js
+          sed -i "s/APP_KEY/${APP_KEY}/g" tracker.js
 
-          # Commit and push
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add tracker.js
-          git commit -m "Inject AstronomyAPI credentials" || echo "No changes to commit"
-          git push origin main
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GH_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./repo
