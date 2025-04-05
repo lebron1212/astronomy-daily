@@ -17,9 +17,7 @@ export async function handler(event) {
   const yyyy_mm_dd = now.toISOString().split("T")[0];
   const hh_mm = now.toISOString().split("T")[1].slice(0, 5); // "HH:MM"
 
-  const creds = Buffer.from(
-    process.env.ASTRO_USER + ":" + process.env.ASTRO_KEY
-  ).toString("base64");
+  const creds = Buffer.from(`${process.env.ASTRO_USER}:${process.env.ASTRO_KEY}`).toString("base64");
 
   const headers = {
     "Content-Type": "application/json",
