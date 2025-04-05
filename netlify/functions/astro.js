@@ -3,8 +3,6 @@ export async function handler(event) {
   const latitude = parseFloat(body.latitude);
   const longitude = parseFloat(body.longitude);
 
-  console.log("NETLIFY FUNC → lat:", latitude, "lon:", longitude);
-
   if (!latitude || !longitude) {
     return {
       statusCode: 400,
@@ -12,18 +10,16 @@ export async function handler(event) {
     };
   }
 
-  // Format current UTC date and time
   const now = new Date();
   const yyyy_mm_dd = now.toISOString().split("T")[0];
-  const hh_mm = now.toISOString().split("T")[1].slice(0, 5); // "HH:MM"
+  const hh_mm = now.toISOString().split("T")[1].slice(0, 5);
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${process.env.ASTRO_KEY}`, // ✅ NEW AUTH METHOD
+    "x-app-id": process.env.ASTRO_APP_ID,
   };
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
-
   const requestBody = {
     latitude,
     longitude,
@@ -32,8 +28,6 @@ export async function handler(event) {
     to_date: yyyy_mm_dd,
     time: hh_mm,
   };
-
-  console.log("Request body:", JSON.stringify(requestBody));
 
   const response = await fetch(url, {
     method: "POST",
