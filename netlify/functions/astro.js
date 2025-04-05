@@ -12,6 +12,11 @@ export async function handler(event) {
     };
   }
 
+  // Format current UTC date and time
+  const now = new Date();
+  const yyyy_mm_dd = now.toISOString().split("T")[0];
+  const hh_mm = now.toISOString().split("T")[1].slice(0, 5); // "HH:MM"
+
   const creds = Buffer.from(
     process.env.ASTRO_USER + ":" + process.env.ASTRO_KEY
   ).toString("base64");
@@ -21,15 +26,31 @@ export async function handler(event) {
     "Authorization": "Basic " + creds,
   };
 
-  const url = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=${latitude}&longitude=${longitude}&from_date=today&to_date=today&elevation=1`;
+  const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
 
-  const response = await fetch(url, { headers });
+  const requestBody = {
+    latitude,
+    longitude,
+    elevation: 1,
+    from_date: yyyy_mm_dd,
+    to_date: yyyy_mm_dd,
+    time: hh_mm,
+  };
+
+  console.log("Request body:", JSON.stringify(requestBody));
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(requestBody),
+  });
 
   if (!response.ok) {
-    console.error("AstronomyAPI failed:", await response.text());
+    const errorText = await response.text();
+    console.error("AstronomyAPI failed:", errorText);
     return {
       statusCode: response.status,
-      body: JSON.stringify({ error: "Failed to fetch data from AstronomyAPI" }),
+      body: errorText,
     };
   }
 
