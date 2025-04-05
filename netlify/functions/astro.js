@@ -12,18 +12,14 @@ export async function handler(event) {
     };
   }
 
+  // Format current UTC date and time
   const now = new Date();
   const yyyy_mm_dd = now.toISOString().split("T")[0];
-  const hh_mm = now.toISOString().split("T")[1].slice(0, 5);
-
-  const rawCreds = `${process.env.ASTRO_USER}:${process.env.ASTRO_KEY}`;
-  const creds = Buffer.from(rawCreds).toString("base64");
-
-  console.log("AUTH HEADER (decoded):", rawCreds); // TEMPORARY DEBUG
+  const hh_mm = now.toISOString().split("T")[1].slice(0, 5); // "HH:MM"
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Basic ${creds}`,
+    "Authorization": `Bearer ${process.env.ASTRO_KEY}`, // ✅ NEW AUTH METHOD
   };
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
