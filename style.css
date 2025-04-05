@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  background: #0d0d0d;
+  color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+main#tracker {
+  max-width: 700px;
+  width: 100%;
+}
+
+.title {
+  font-size: 2rem;
+  letter-spacing: 0.2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+
+.pulse-indicator {
+  width: 12px;
+  height: 12px;
+  background: #4affc5;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 255, 197, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(74, 255, 197, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 255, 197, 0); }
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.4rem;
+  letter-spacing: 0.1rem;
+}
+
+.astro-event {
+  background: #1a1a1a;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.05);
+  transition: background 0.3s;
+}
+
+.astro-event h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.1rem;
+  color: #4affc5;
+}
+
+.astro-event p {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+/* Optional Light Mode (CSS toggle-ready) */
+body.light {
+  background: #ffffff;
+  color: #111;
+}
+
+body.light .astro-event {
+  background: #f4f4f4;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+body.light .astro-event h3 {
+  color: #007777;
+}
