@@ -3,32 +3,27 @@ export async function handler(event) {
   const latitude = parseFloat(body.latitude);
   const longitude = parseFloat(body.longitude);
 
-  console.log("🌐 NETLIFY FUNC → lat:", latitude, "lon:", longitude);
+  console.log("📍 Location:", latitude, longitude);
 
   if (!latitude || !longitude) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing or invalid lat/lon" }),
+      body: JSON.stringify({ error: "Missing lat/lon" }),
     };
   }
 
-  // Format UTC date and time for AstronomyAPI
   const now = new Date();
   const yyyy_mm_dd = now.toISOString().split("T")[0];
   const hh_mm = now.toISOString().split("T")[1].slice(0, 5);
 
-  // ✅ Basic Auth with App ID and App Secret
-  const authString = `${process.env.ASTRO_APP_ID}:${process.env.ASTRO_APP_SECRET}`;
-  const encodedAuth = Buffer.from(authString).toString("base64");
-
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Basic ${encodedAuth}`,
+    "apiKey": process.env.ASTRONOMY_API_KEY, // 🔥 THIS is the new format
   };
 
   const url = "https://api.astronomyapi.com/api/v2/bodies/positions";
 
-  const requestBody = {
+  const bodyData = {
     latitude,
     longitude,
     elevation: 1,
@@ -37,36 +32,26 @@ export async function handler(event) {
     time: hh_mm,
   };
 
-  console.log("📡 Sending AstronomyAPI request:", JSON.stringify(requestBody));
-  console.log("🔐 Encoded Basic Auth:", encodedAuth.slice(0, 10) + "…");
+  console.log("🚀 Sending request to AstronomyAPI:", bodyData);
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(requestBody),
-    });
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(bodyData),
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("❌ AstronomyAPI error:", errorText);
-      return {
-        statusCode: response.status,
-        body: errorText,
-      };
-    }
-
-    const data = await response.json();
-    console.log("✅ AstronomyAPI success");
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("❌ Error from AstronomyAPI:", errorText);
     return {
-      statusCode: 200,
-      body: JSON.stringify(data),
-    };
-  } catch (err) {
-    console.error("🚨 Request failed:", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error", details: err.message }),
+      statusCode: response.status,
+      body: errorText,
     };
   }
+
+  const data = await response.json();
+  return {
+    statusCode: 200,
+    body: JSON.stringify(data),
+  };
 }
