@@ -11,30 +11,33 @@ function fetchLocationAndData() {
 
       if (!lat || !lon) {
         console.warn("Invalid IP location — falling back to LA");
-        fetchAstronomyData(34.0522, -118.2437); // Los Angeles fallback
+        fetchCelestialData(34.0522, -118.2437); // Los Angeles fallback
       } else {
-        fetchAstronomyData(lat, lon);
+        fetchCelestialData(lat, lon);
       }
     })
     .catch(err => {
       console.warn("IP geolocation error — using fallback:", err);
-      fetchAstronomyData(34.0522, -118.2437); // Fallback: Los Angeles
+      fetchCelestialData(34.0522, -118.2437);
     });
 }
 
-function fetchAstronomyData(latitude, longitude) {
+function fetchCelestialData(latitude, longitude) {
   console.log("Sending coords to Netlify:", latitude, longitude);
 
-  fetch("/.netlify/functions/astro", {
+  fetch("/.netlify/functions/celestial", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ latitude, longitude }),
   })
     .then(res => res.json())
     .then(data => {
-      if (!data || !data.data || !data.data.table) {
-        throw new Error("Invalid response from AstronomyAPI");
+      if (!data || !data.astronomy) {
+        throw new Error("Invalid response from Celestial API");
       }
-      renderCelestialEvents(data.data.table.rows);
+      renderAstronomy(data.astronomy);
+      renderConstellations(data.constellations || []);
+      renderCelestialEvents(data.celestial_events || []);
     })
     .catch(err => {
       console.error("Fetch failed:", err);
@@ -42,22 +45,47 @@ function fetchAstronomyData(latitude, longitude) {
     });
 }
 
-function renderCelestialEvents(bodies) {
-  eventList.innerHTML = "";
-  bodies.forEach(row => {
-    const name = row.entry.name;
-    const rise = row.entry.rise?.time || "N/A";
-    const set = row.entry.set?.time || "N/A";
+function renderAstronomy(astro) {
+  const el = document.createElement("div");
+  el.className = "astro-event";
+  el.innerHTML = `
+    <h3>🌙 Moon Phase: ${astro.moon_phase_label} (${Math.round(astro.moon_phase_value * 100)}%)</h3>
+    <p>Sunrise: ${astro.sunrise}</p>
+    <p>Sunset: ${astro.sunset}</p>
+    <p>Moonrise: ${astro.moonrise}</p>
+    <p>Moonset: ${astro.moonset}</p>
+    <p>Moon Altitude: ${astro.moon_altitude}&deg;</p>
+    <p>Moon Illumination: ${astro.moon_illumination}%</p>
+  `;
+  eventList.appendChild(el);
+}
 
-    const el = document.createElement("div");
-    el.className = "astro-event";
-    el.innerHTML = `
-      <h3>${name}</h3>
-      <p>Rise: ${rise}</p>
-      <p>Set: ${set}</p>
-    `;
-    eventList.appendChild(el);
+function renderConstellations(constellations) {
+  if (constellations.length === 0) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "astro-event";
+  wrapper.innerHTML = `<h3>✨ Visible Constellations</h3>`;
+  constellations.forEach(c => {
+    const item = document.createElement("p");
+    item.textContent = c.name;
+    wrapper.appendChild(item);
   });
+  eventList.appendChild(wrapper);
+}
+
+function renderCelestialEvents(events) {
+  if (events.length === 0) return;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "astro-event";
+  wrapper.innerHTML = `<h3>🚀 Upcoming Celestial Events</h3>`;
+  events.forEach(e => {
+    const item = document.createElement("p");
+    item.innerHTML = `<strong>${e.date}</strong>: ${e.title} — ${e.description}`;
+    wrapper.appendChild(item);
+  });
+  eventList.appendChild(wrapper);
 }
 
 fetchLocationAndData();
